@@ -20,8 +20,8 @@ public class ArrowScript : MonoBehaviour {
 
 	void OnTriggerEnter(Collider Other){
     if(Other.gameObject.CompareTag("PlayerTrigger") && active){
-      controller.hitByArrow = controller.hitByArrow + 1;
-			Destroy(gameObject);
+      controller.hitByArrow++;
+	  Destroy(gameObject);
       controller.damageChecking(id);
 
     }
