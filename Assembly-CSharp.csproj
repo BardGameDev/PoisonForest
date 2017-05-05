@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\ArrowScript.cs" />
+     <Compile Include="Assets\Scripts\BladeRotation.cs" />
      <Compile Include="Assets\Scripts\ButtonController.cs" />
      <Compile Include="Assets\Scripts\CPadController.cs" />
      <Compile Include="Assets\Scripts\CameraController.cs" />
@@ -61,6 +62,7 @@
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\PoisonFog.cs" />
      <Compile Include="Assets\Scripts\ProjectileLauncher.cs" />
+     <Compile Include="Assets\Scripts\ResetCube.cs" />
      <Compile Include="Assets\Scripts\SpeedPadController.cs" />
      <Compile Include="Assets\Scripts\UIScript.cs" />
      <None Include="Assets\Standard Assets\ParticleSystems\Shaders\PriorityParticleAlpha.shader" />

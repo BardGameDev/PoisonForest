@@ -7,8 +7,8 @@ public class LevelController : MonoBehaviour
 {
     public int playerHealth;//called by Poison Fog, once the playerHealth hits 0 the game should restart
     private string pickUpID;
-    public int hitByArrow;
-    public int standingInFog = 5;
+
+    public int armor;
     public int spawnPlatform;
     private GameObject player;
 
@@ -18,16 +18,29 @@ public class LevelController : MonoBehaviour
     private string timerID;
     private bool startTimer; // is there a timer active
     private float timeLeft;
+    private float timeHeld;
 
-    private GameObject platformsToAppear; // when the player pushes a button, this platform or set of platforms will appear
+    private GameObject platformsToAppear1;
+    private GameObject platformsToAppear2;
+
+    private bool lFanState;
+    private bool rFanState;
+
+    private Vector3 spawnPos;
+     // when the player pushes a button, this platform or set of platforms will appear
 
     void Start()
     {
-        hitByArrow = 0;
+        armor = 5;
         playerHealth = 100;
         player = GameObject.FindWithTag("Player");
-        platformsToAppear = GameObject.FindWithTag("PlatToAppear"); //Get a reference to the collection of paltforms
-        platformsToAppear.SetActive(false); //Then immediately deactivate it... you can't reference an inactive object from the get-go
+        spawnPos = player.transform.position;
+        spawnPlatform = 0;
+
+        platformsToAppear1 = GameObject.FindWithTag("PlatToAppear"); //Get a reference to the collection of paltforms
+        platformsToAppear1.SetActive(false); //Then immediately deactivate it... you can't reference an inactive object from the get-go
+        platformsToAppear2 = GameObject.FindWithTag("PlatToAppear2");
+        platformsToAppear2.SetActive(false);
     }
 
     void Update()
@@ -45,7 +58,34 @@ public class LevelController : MonoBehaviour
 
     public void dropTrigger(string id, GameObject missingChild)
     {
+      if (id.Equals("RightFan") && missingChild.GetComponent<PickUpController>().id.Equals("RBattery")){
+        missingChild.SetActive(false);
+        GameObject.Find("FanObject R").GetComponent<BladeRotation>().active = true;
+        lFanState = true;
+        destroyFog();
+        }
+      if (id.Equals("LeftFan") && missingChild.GetComponent<PickUpController>().id.Equals("LBattery")){
+        missingChild.SetActive(false);
+        GameObject.Find("FanObject L").GetComponent<BladeRotation>().active = true;
+        rFanState = true;
+        destroyFog();
+      }
+    }
 
+    public void destroyFog()
+    {
+      GameObject Fog1 = GameObject.Find("Poison Fog 1");
+      GameObject Fog2 = GameObject.Find("Poison Fog 2");
+      GameObject Fog3 = GameObject.Find("Poison Fog 3");
+      if (lFanState && rFanState){
+        Fog1.SetActive(false);
+      }
+      if (lFanState && Fog3 != null){
+        Fog3.SetActive(false);
+      }
+      if (rFanState && Fog2 != null){
+        Fog2.SetActive(false);
+      }
     }
     //Called by PickUpController
     public void pickUpObject(string id, GameObject pickUp)
@@ -54,17 +94,32 @@ public class LevelController : MonoBehaviour
     }
 
     //Called by ButtonController
-    public void buttonPressed(string id, int type, bool beenClicked, GameObject button, GameObject puzzle)
+    public void buttonPressed(string id, bool beenClicked, GameObject button, GameObject puzzle)
     {
-        if (id.Equals("plat_contain"))
+        if (id.Equals("plat_contain1"))
         {
-            platformsToAppear.SetActive(true); //if you hit the button responsible for the platforms, activate the platforms whether they're active, already, or not
+          platformsToAppear1.SetActive(true); //if you hit the button responsible for the platforms, activate the platforms whether they're active, already, or not
         }
+        else if (id.Equals("plat_contain2")){
+          platformsToAppear2.SetActive(true);
+        }
+    }
+
+    public void buttonActivate(string id, GameObject button, GameObject puzzle){
+      timerID = id;
+      curr_button_puzzle = puzzle;
+      curr_button_script = button.GetComponent<ButtonController>();
+      if (id.Equals("ArrowDeactivate")){
+        timeLeft = 6;
+        startTimer = true;
+        }
+    }
+
+    public void buttonDeactivate(string id, GameObject puzzle){
     }
 
     public void buttonCount(string id, float timer, bool beenClicked, GameObject button, GameObject puzzle)
     {
-
         timerID = id;
         timeLeft = timer;
         curr_button_script = button.GetComponent<ButtonController>();
@@ -85,6 +140,10 @@ public class LevelController : MonoBehaviour
         {
             curr_button_puzzle.GetComponent<FanController>().active = false;
         }
+        if (id.Equals("ArrowDeactivate")){
+          curr_button_puzzle.SetActive(false);
+        }
+
     }
 
     //Called by cPad controller
@@ -94,10 +153,8 @@ public class LevelController : MonoBehaviour
 
     public void setSpawn(GameObject spawn)
     {
-        if (spawn.name == "1SP1")
-        {
+        if (spawn.name == "1SP1"){
             spawnPlatform = 1;
-            Debug.Log("Spawn set to 1");
         }
         else if (spawn.name == "1SP2"){
             spawnPlatform = 2;
@@ -105,9 +162,15 @@ public class LevelController : MonoBehaviour
     }
     public void respawn()
     {
+      armor = 5;
+      playerHealth = 100;
+        if (spawnPlatform == 0)
+        {
+          player.transform.position = spawnPos;
+        }
         if (spawnPlatform == 1)
         {
-            player.transform.position = GameObject.Find("1SP1").transform.position + new Vector3(0.0f, 1.0f, 0.0f);
+          player.transform.position = GameObject.Find("1SP1").transform.position + new Vector3(0.0f, 1.0f, 0.0f);
         }
         if (spawnPlatform == 2){
           player.transform.position = GameObject.Find("1SP2").transform.position + new Vector3(0.0f, 1.0f, 0.0f);
@@ -120,17 +183,13 @@ public class LevelController : MonoBehaviour
         if (id[0] == '1')
         { // check that trigger is in level 1
             id = id.Substring(1);//Remove level prefix from id
-            if (id.Equals("poisonfog"))
-            {
-                if (playerHealth <= 0)
-                {
+            if (id.Equals("poisonfog")){
+                if (playerHealth <= 0){
                     respawn();
                 }
             }
-            else if (id.Equals("arrow"))
-            {
-                if (hitByArrow >= 3)
-                {
+            else if (id.Equals("arrow")){
+                if (armor == 0){
                     respawn();
                 }
             }

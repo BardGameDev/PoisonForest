@@ -83,7 +83,7 @@ public class PlayerController : MonoBehaviour {
         }
         if (Other.gameObject.tag.Contains("Spawn"))
         {
-						Debug.Log("Contact with Spawn");
+						//Debug.Log("Contact with Spawn");
             controller.setSpawn(Other.gameObject);
 					}
 				}
