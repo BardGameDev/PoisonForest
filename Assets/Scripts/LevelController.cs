@@ -32,6 +32,7 @@ public class LevelController : MonoBehaviour
 
     void Update()
     {
+        Debug.LogWarning(hitByArrow);
         if (startTimer)
         {
             timeLeft -= Time.deltaTime;
@@ -99,18 +100,12 @@ public class LevelController : MonoBehaviour
             spawnPlatform = 1;
             Debug.Log("Spawn set to 1");
         }
-        else if (spawn.name == "1SP2"){
-            spawnPlatform = 2;
-        }
     }
     public void respawn()
     {
         if (spawnPlatform == 1)
         {
             player.transform.position = GameObject.Find("1SP1").transform.position + new Vector3(0.0f, 1.0f, 0.0f);
-        }
-        if (spawnPlatform == 2){
-          player.transform.position = GameObject.Find("1SP2").transform.position + new Vector3(0.0f, 1.0f, 0.0f);
         }
     }
 
@@ -124,7 +119,7 @@ public class LevelController : MonoBehaviour
             {
                 if (playerHealth <= 0)
                 {
-                    respawn();
+                    SceneManager.LoadScene("GetTheGear");
                 }
             }
             else if (id.Equals("arrow"))
@@ -325,3 +320,5 @@ public class LevelController : MonoBehaviour {
 		}
 	}
 }*/
+
+

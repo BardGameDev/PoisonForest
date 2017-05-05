@@ -33,7 +33,6 @@ public class PoisonFog : MonoBehaviour {
   //the coroutine here should only iterate once every few seconds so as to not immediately kill the player
   IEnumerator damageAfterDelay(float delay){
     while (poisoned){
-      Debug.Log("Activated coroutine");
       controller.playerHealth = controller.playerHealth - damage;
       yield return new WaitForSeconds(delay); //delays the while loop from occuring again until the interval for damage comes again
       controller.damageChecking(id);
