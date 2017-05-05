@@ -18,7 +18,7 @@ public class ProjectileLauncher : MonoBehaviour {
 		while (on){
 			GameObject projectile = Instantiate(prefab,this.transform.position+ this.transform.forward,this.transform.rotation);
 			projectile.GetComponent<Rigidbody>().AddForce(this.transform.forward*shootForce);
-			yield return new WaitForSeconds(2.0f);
+			yield return new WaitForSeconds(Random.Range(0f,5.0f));
 	}
 	}
 
