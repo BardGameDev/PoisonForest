@@ -6,7 +6,8 @@ using UnityEngine;
 public class LevelController : MonoBehaviour
 {
     public int playerHealth;//called by Poison Fog, once the playerHealth hits 0 the game should restart
-    private string pickUpID;
+	public bool gameWon;
+	private string pickUpID;
 
     public int armor;
     public int spawnPlatform;
@@ -31,25 +32,25 @@ public class LevelController : MonoBehaviour
 
     void Start()
     {
+		gameWon = false;
         armor = 5;
         playerHealth = 100;
         player = GameObject.FindWithTag("Player");
-        spawnPos = player.transform.position;
+		spawnPos = player.transform.position;
         spawnPlatform = 0;
-
-        platformsToAppear1 = GameObject.FindWithTag("PlatToAppear"); //Get a reference to the collection of paltforms
-        platformsToAppear1.SetActive(false); //Then immediately deactivate it... you can't reference an inactive object from the get-go
-        platformsToAppear2 = GameObject.FindWithTag("PlatToAppear2");
-        platformsToAppear2.SetActive(false);
+//        platformsToAppear1 = GameObject.FindWithTag("PlatToAppear"); //Get a reference to the collection of paltforms
+//        platformsToAppear1.SetActive(false); //Then immediately deactivate it... you can't reference an inactive object from the get-go
+//        platformsToAppear2 = GameObject.FindWithTag("PlatToAppear2");
+//        platformsToAppear2.SetActive(false);
     }
 
     void Update()
     {
-        if (startTimer)
+		if (startTimer)
         {
             timeLeft -= Time.deltaTime;
             print("timeleft: " + timeLeft.ToString());
-            if (timeLeft < 0)
+			if (timeLeft <= 0)
             {
                 timerDone(timerID);
             }
@@ -96,54 +97,73 @@ public class LevelController : MonoBehaviour
     //Called by ButtonController
     public void buttonPressed(string id, bool beenClicked, GameObject button, GameObject puzzle)
     {
-        if (id.Equals("plat_contain1"))
-        {
-          platformsToAppear1.SetActive(true); //if you hit the button responsible for the platforms, activate the platforms whether they're active, already, or not
-        }
-        else if (id.Equals("plat_contain2")){
-          platformsToAppear2.SetActive(true);
-        }
+//        if (id.Equals("plat_contain1"))
+//        {
+//          platformsToAppear1.SetActive(true); //if you hit the button responsible for the platforms, activate the platforms whether they're active, already, or not
+//        }
+//        else if (id.Equals("plat_contain2")){
+//          platformsToAppear2.SetActive(true);
+//        }
+		if (id.Equals ("Win")) {
+			//curr_button_script.ToggleClicked();
+			StartCoroutine (delay());
+		}
     }
 
-    public void buttonActivate(string id, GameObject button, GameObject puzzle){
-      timerID = id;
-      curr_button_puzzle = puzzle;
-      curr_button_script = button.GetComponent<ButtonController>();
-      if (id.Equals("ArrowDeactivate")){
-        timeLeft = 6;
-        startTimer = true;
-        }
-    }
+	IEnumerator delay ()
+	{
+		spawnPlatform = 0;
+		gameWon = true;
+		respawn ();
+
+		yield return new WaitForSeconds (5f);
+
+		gameWon = false;
+		//curr_button_script.ToggleClicked();
+	}
+
+    public void buttonActivate (string id, GameObject button, GameObject puzzle)
+	{
+		timerID = id;
+		curr_button_puzzle = puzzle;
+		curr_button_script = button.GetComponent<ButtonController> ();
+		if (id.Equals ("ArrowDeactivate")) {
+			//curr_button_script.ToggleClicked();
+			timeLeft = 3;
+			startTimer = true;
+		}
+
+		if (id.Equals ("Win")) {
+			//curr_button_script.ToggleClicked();
+			StartCoroutine (delay());
+			timeLeft = 5;
+			startTimer = true;
+		}
+	}
 
     public void buttonDeactivate(string id, GameObject puzzle){
     }
 
-    public void buttonCount(string id, float timer, bool beenClicked, GameObject button, GameObject puzzle)
+	public void buttonCount(string id, float timer, bool beenClicked, GameObject button, GameObject puzzle)
     {
         timerID = id;
         timeLeft = timer;
         curr_button_script = button.GetComponent<ButtonController>();
         curr_button_puzzle = puzzle;
-        startTimer = beenClicked;
-
-        if (id.Equals("clock_fan"))
-        {
-            curr_button_puzzle.GetComponent<FanController>().active = beenClicked;
-        }
+  
+		startTimer = beenClicked;
+		if (id.Equals ("Win")) {
+			//curr_button_script.ToggleClicked();
+			StartCoroutine (delay());
+		}
     }
 
     void timerDone(string id)
     {
         startTimer = false;
-        curr_button_script.ToggleClicked();
-        if (id.Equals("clock_fan"))
-        {
-            curr_button_puzzle.GetComponent<FanController>().active = false;
-        }
         if (id.Equals("ArrowDeactivate")){
           curr_button_puzzle.SetActive(false);
         }
-
     }
 
     //Called by cPad controller
@@ -160,22 +180,24 @@ public class LevelController : MonoBehaviour
             spawnPlatform = 2;
         }
     }
-    public void respawn()
-    {
-      armor = 5;
-      playerHealth = 100;
-        if (spawnPlatform == 0)
-        {
-          player.transform.position = spawnPos;
-        }
-        if (spawnPlatform == 1)
-        {
-          player.transform.position = GameObject.Find("1SP1").transform.position + new Vector3(0.0f, 1.0f, 0.0f);
-        }
-        if (spawnPlatform == 2){
-          player.transform.position = GameObject.Find("1SP2").transform.position + new Vector3(0.0f, 1.0f, 0.0f);
-        }
-    }
+	public void respawn ()
+	{
+		armor = 5;
+		playerHealth = 100;
+
+		player.GetComponent<Rigidbody> ().velocity = Vector3.zero;
+		player.GetComponent<Rigidbody> ().angularVelocity = Vector3.zero;
+
+		if (spawnPlatform == 0) {
+			player.transform.position = spawnPos;
+		}
+		if (spawnPlatform == 1) {
+			player.transform.position = GameObject.Find ("1SP1").transform.position + new Vector3 (0.0f, 1.0f, 0.0f);
+		}
+		if (spawnPlatform == 2) {
+			player.transform.position = GameObject.Find ("1SP2").transform.position + new Vector3 (0.0f, 1.0f, 0.0f);
+		}
+	}
 
     //called by the Poison Fog to check the level health for every moment the player is in the fog. If the health is 0 or below, reset the game.
     public void damageChecking(string id)
@@ -189,7 +211,7 @@ public class LevelController : MonoBehaviour
                 }
             }
             else if (id.Equals("arrow")){
-                if (armor == 0){
+                if (armor <= 0){
                     respawn();
                 }
             }

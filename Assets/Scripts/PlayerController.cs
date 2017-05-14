@@ -10,8 +10,6 @@ public class PlayerController : MonoBehaviour {
 	private Transform cam;
 	private LevelController controller;
 
-	public GameObject cubePrefab;
-
 	private float offsetX;
 	private float offsetZ;
     public float topSpeed;
@@ -25,7 +23,6 @@ public class PlayerController : MonoBehaviour {
 		cam = GameObject.FindGameObjectWithTag ("MainCamera").transform;
     topSpeed = speed * 1.2f;
 		playerRB = GetComponent<Rigidbody> ();
-		cubeRB = cubePrefab.GetComponent<Rigidbody>();
 		controller = GameObject.FindGameObjectWithTag ("Controller").GetComponent<LevelController>();
 		gravDown = new Vector3(0, -25, 0);
 

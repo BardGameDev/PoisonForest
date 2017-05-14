@@ -12,10 +12,12 @@ public class ButtonController : MonoBehaviour {
 	private LevelController controller;
 	private Renderer rend;
 	private bool beenClicked = false;
+	private GameObject player;
 
 	void Start(){
 		rend = GetComponent<Renderer>();
 		controller =  GameObject.FindGameObjectWithTag ("Controller").GetComponent<LevelController>();
+		player = GameObject.FindWithTag("Player");
 	}
 
 	void OnTriggerEnter(Collider Other) {
